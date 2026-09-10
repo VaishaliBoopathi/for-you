@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>For You ♡</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@400;500&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --paper:#101012;
+    --paper-dark:#18181b;
+    --card:#19191d;
+
+    --ink:#eeeae8;
+    --muted:#949198;
+
+    --line:#303036;
+
+    --lavender:#aaa5cf;
+    --sage:#aebfb3;
+    --blue:#9fb5c3;
+    --pink:#c9aeb2;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"DM Sans",sans-serif;
+    overflow-x:hidden;
+}
+
+button{
+    font-family:inherit;
+}
+
+.page{
+    width:100%;
+    max-width:900px;
+    margin:auto;
+    padding:0 28px;
+}
+
+.tiny{
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+.hand{
+    font-family:"Patrick Hand",cursive;
+}
+
+.center{
+    text-align:center;
+}
+
+
+/* ======================================
+   FLOATING SYMBOLS
+====================================== */
+
+.floating{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:50;
+}
+
+.float-item{
+    position:absolute;
+    bottom:-30px;
+    color:#aaa5bf;
+    opacity:.25;
+    animation:rise linear forwards;
+}
+
+@keyframes rise{
+
+    from{
+        transform:translateY(0) rotate(0);
+        opacity:0;
+    }
+
+    15%{
+        opacity:.3;
+    }
+
+    to{
+        transform:translateY(-110vh) rotate(90deg);
+        opacity:0;
+    }
+
+}
+
+
+/* ======================================
+   PATTERN LOCK
+====================================== */
+
+.lock-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.lock-inner{
+    width:100%;
+    max-width:500px;
+    padding:50px 25px;
+}
+
+.lock-title{
+    font-family:"Playfair Display",serif;
+    font-size:clamp(55px,11vw,90px);
+    line-height:.9;
+    font-weight:400;
+    margin:25px 0;
+}
+
+.lock-title span{
+    display:block;
+    color:var(--lavender);
+    font-style:italic;
+}
+
+.lock-description{
+    max-width:390px;
+    margin:auto;
+    color:var(--muted);
+    line-height:1.8;
+    font-size:14px;
+}
+
+
+/* ======================================
+   PATTERN AREA
+====================================== */
+
+.pattern-area{
+    width:270px;
+    height:270px;
+    margin:55px auto 15px;
+    position:relative;
+
+    touch-action:none;
+    user-select:none;
+}
+
+.pattern-grid{
+    position:absolute;
+    inset:0;
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+
+    gap:25px;
+
+    z-index:3;
+}
+
+.pattern-dot{
+    width:50px;
+    height:50px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    border:1px solid var(--line);
+
+    background:#151519;
+
+    cursor:pointer;
+
+    position:relative;
+
+    transition:.25s ease;
+}
+
+.pattern-dot::after{
+    content:"";
+
+    position:absolute;
+
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:var(--muted);
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    transition:.25s ease;
+}
+
+.pattern-dot.active{
+    background:#29273a;
+    border-color:var(--lavender);
+
+    transform:scale(1.05);
+}
+
+.pattern-dot.active::after{
+    width:14px;
+    height:14px;
+
+    background:var(--lavender);
+}
+
+
+/* Pattern lines */
+
+.pattern-lines{
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    z-index:2;
+
+    pointer-events:none;
+
+    overflow:visible;
+}
+
+.pattern-lines line{
+    stroke:var(--lavender);
+
+    stroke-width:4;
+
+    stroke-linecap:round;
+
+    opacity:.9;
+}
+
+.lock-hint{
+    color:var(--muted);
+
+    font-size:12px;
+
+    margin-top:15px;
+}
+
+.lock-status{
+    min-height:25px;
+
+    margin-top:18px;
+
+    font-family:"Patrick Hand",cursive;
+
+    font-size:19px;
+}
+
+.lock-status.error{
+    color:var(--pink);
+}
+
+.lock-status.success{
+    color:var(--sage);
+}
+
+
+/* ======================================
+   MAIN WEBSITE
+====================================== */
+
+#website{
+    display:none;
+}
+
+#website.show{
+    display:block;
+}
+
+
+/* ======================================
+   HERO
+====================================== */
+
+.hero{
+    min-height:100vh;
+
+    display:flex;
+    align-items:center;
+
+    position:relative;
+}
+
+.hero-inner{
+    width:100%;
+
+    padding:70px 0;
+}
+
+.date{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:70px;
+}
+
+.tiny-line{
+    width:70px;
+
+    height:1px;
+
+    background:var(--line);
+}
+
+.hero-title{
+    font-family:"Playfair Display",serif;
+
+    font-size:clamp(60px,12vw,125px);
+
+    line-height:.9;
+
+    font-weight:400;
+
+    margin-bottom:35px;
+}
+
+.hero-title span{
+    display:block;
+
+    font-style:italic;
+
+    color:#b5afd5;
+}
+
+.hero-description{
+    max-width:480px;
+
+    font-size:15px;
+
+    line-height:1.9;
+
+    color:var(--muted);
+}
+
+.scroll-note{
+    margin-top:80px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    color:var(--muted);
+
+    font-size:12px;
+}
+
+.scroll-arrow{
+    animation:arrowMove 1.5s infinite;
+}
+
+@keyframes arrowMove{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(6px);
+    }
+
+}
+
+
+/* ======================================
+   SECTION
+====================================== */
+
+.section{
+    padding:120px 0;
+
+    border-top:1px solid var(--line);
+}
+
+
+/* ======================================
+   THINGS ABOUT HIM
+====================================== */
+
+.about-heading{
+    font-family:"Playfair Display",serif;
+
+    font-size:clamp(40px,7vw,70px);
+
+    font-weight:400;
+
+    line-height:1;
+
+    margin-top:20px;
+}
+
+.about-description{
+    max-width:440px;
+
+    margin:25px auto 60px;
+
+    color:var(--muted);
+
+    font-size:14px;
+
+    line-height:1.8;
+}
+
+.traits{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:1px;
+
+    background:var(--line);
+
+    border:1px solid var(--line);
+}
+
+.trait{
+    background:var(--card);
+
+    padding:35px;
+
+    min-height:200px;
+
+    transition:.3s ease;
+}
+
+.trait:hover{
+    background:#1d1d22;
+}
+
+.trait-number{
+    color:var(--muted);
+
+    font-size:10px;
+
+    letter-spacing:2px;
+}
+
+.trait h3{
+    font-family:"Playfair Display",serif;
+
+    font-size:30px;
+
+    font-weight:400;
+
+    margin:25px 0 12px;
+}
+
+.trait p{
+    color:var(--muted);
+
+    font-size:13px;
+
+    line-height:1.7;
+}
+
+
+/* ======================================
+   BITMOJI
+====================================== */
+
+.bitmoji-section{
+    min-height:90vh;
+
+    padding:120px 0;
+
+    border-top:1px solid var(--line);
+
+    display:flex;
+
+    align-items:center;
+}
+
+.bitmoji-heading{
+    font-family:"Playfair Display",serif;
+
+    font-size:clamp(42px,8vw,75px);
+
+    font-weight:400;
+
+    line-height:1;
+
+    margin:20px 0;
+}
+
+.bitmoji-heading span{
+    color:var(--lavender);
+
+    font-style:italic;
+}
+
+.bitmoji-description{
+    max-width:440px;
+
+    margin:auto;
+
+    color:var(--muted);
+
+    font-size:14px;
+
+    line-height:1.8;
+}
+
+.bitmoji-frame{
+    max-width:650px;
+
+    margin:60px auto 0;
+
+    padding:14px;
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.4);
+
+    position:relative;
+
+    transform:rotate(-1deg);
+}
+
+.bitmoji-frame img{
+    width:100%;
+
+    display:block;
+
+    max-height:520px;
+
+    object-fit:contain;
+
+    background:#141418;
+}
+
+.scribble{
+    position:absolute;
+
+    font-family:"Patrick Hand",cursive;
+
+    font-size:22px;
+
+    color:var(--lavender);
+
+    z-index:2;
+}
+
+.scribble.one{
+    top:-28px;
+
+    left:-25px;
+
+    transform:rotate(-7deg);
+}
+
+.scribble.two{
+    bottom:-28px;
+
+    right:-20px;
+
+    transform:rotate(5deg);
+}
+
+
+/* ======================================
+   LETTER
+====================================== */
+
+.letter{
+    padding:120px 0;
+
+    border-top:1px solid var(--line);
+}
+
+.letter-box{
+    max-width:700px;
+
+    margin:auto;
+
+    background:var(--card);
+
+    padding:55px;
+
+    border:1px solid var(--line);
+
+    position:relative;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.25);
+}
+
+.letter-box::before{
+    content:"for you";
+
+    position:absolute;
+
+    top:18px;
+
+    right:25px;
+
+    font-family:"Patrick Hand",cursive;
+
+    color:var(--muted);
+
+    transform:rotate(4deg);
+}
+
+.letter-box h2{
+    font-family:"Playfair Display",serif;
+
+    font-size:50px;
+
+    font-weight:400;
+
+    margin-bottom:35px;
+}
+
+.letter-box p{
+    font-family:"Patrick Hand",cursive;
+
+    font-size:23px;
+
+    line-height:1.65;
+
+    margin-bottom:20px;
+}
+
+
+/* ======================================
+   OSU GAME
+====================================== */
+
+.game{
+    margin:70px auto 120px;
+
+    max-width:900px;
+
+    padding:0 28px;
+
+    text-align:center;
+}
+
+.game-title{
+    font-family:"Patrick Hand",cursive;
+
+    font-size:24px;
+}
+
+
+/* STRAIGHT LINE */
+
+.oku-board{
+    width:100%;
+
+    max-width:720px;
+
+    margin:35px auto 0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:18px;
+
+    flex-wrap:nowrap;
+}
+
+.oku-dot{
+    width:58px;
+
+    height:58px;
+
+    flex-shrink:0;
+
+    border-radius:50%;
+
+    border:1px solid var(--line);
+
+    background:var(--paper-dark);
+
+    color:var(--ink);
+
+    font-family:"Patrick Hand",cursive;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+    transition:
+        transform .18s ease,
+        opacity .18s ease,
+        border-color .18s ease;
+}
+
+.oku-dot:hover{
+    transform:scale(1.06);
+
+    border-color:var(--lavender);
+}
+
+.oku-dot.clicked{
+    opacity:.35;
+
+    transform:scale(.9);
+}
+
+.oku-dot.wrong{
+    border-color:#8d6262;
+
+    animation:shake .25s ease;
+}
+
+@keyframes shake{
+
+    0%{
+        transform:translateX(0);
+    }
+
+    25%{
+        transform:translateX(-5px);
+    }
+
+    50%{
+        transform:translateX(5px);
+    }
+
+    75%{
+        transform:translateX(-5px);
+    }
+
+    100%{
+        transform:translateX(0);
+    }
+
+}
+
+.oku-secret{
+    display:none;
+
+    margin-top:35px;
+
+    padding-top:25px;
+
+    border-top:1px solid var(--line);
+
+    text-align:center;
+}
+
+.oku-secret.show{
+    display:block;
+}
+
+
+/* ======================================
+   FOOTER
+====================================== */
+
+footer{
+    padding:35px 20px;
+
+    text-align:center;
+
+    border-top:1px solid var(--line);
+
+    color:var(--muted);
+
+    font-size:11px;
+
+    letter-spacing:1px;
+}
+
+
+/* ======================================
+   MOBILE
+====================================== */
+
+@media(max-width:700px){
+
+    .page{
+        padding:0 20px;
+    }
+
+    .hero-title{
+        font-size:65px;
+    }
+
+    .date{
+        margin-bottom:50px;
+    }
+
+    .traits{
+        grid-template-columns:1fr;
+    }
+
+    .trait{
+        min-height:160px;
+    }
+
+    .letter-box{
+        padding:35px 25px;
+    }
+
+    .letter-box h2{
+        font-size:40px;
+    }
+
+    .letter-box p{
+        font-size:21px;
+    }
+
+    .pattern-area{
+        width:240px;
+
+        height:240px;
+    }
+
+
+    /* Mobile osu */
+
+    .oku-board{
+        gap:7px;
+
+        max-width:100%;
+
+        overflow-x:auto;
+
+        justify-content:flex-start;
+
+        padding:10px 5px 15px;
+
+        scrollbar-width:none;
+    }
+
+    .oku-board::-webkit-scrollbar{
+        display:none;
+    }
+
+    .oku-dot{
+        width:52px;
+
+        height:52px;
+
+        font-size:18px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- ======================================
+     FLOATING SYMBOLS
+====================================== -->
+
+<div class="floating" id="floating"></div>
+
+
+<!-- ======================================
+     PASSWORD / PATTERN LOCK
+====================================== -->
+
+<section class="lock-screen" id="lockScreen">
+
+    <div class="lock-inner">
+
+        <div class="tiny">
+            A tiny security check
+        </div>
+
+        <h1 class="lock-title">
+
+            Before
+
+            <span>
+                You enter.
+            </span>
+
+        </h1>
+
+        <p class="lock-description">
+
+            There's something here for you.
+
+            <br>
+
+            But obviously,
+            you don't get access
+            that easily.
+
+        </p>
+
+
+        <div class="pattern-area" id="patternArea">
+
+            <svg
+                class="pattern-lines"
+                id="patternLines"
+                preserveAspectRatio="none">
+            </svg>
+
+
+            <div class="pattern-grid">
+
+                <button
+                    class="pattern-dot"
+                    data-number="1">
+                </button>
+
+                <button
+                    class="pattern-dot"
+                    data-number="2">
+                </button>
+
+                <button
+                    class="pattern-dot"
+                    data-number="3">
+                </button>
+
+
+                <button
+                    class="pattern-dot"
+                    data-number="4">
+                </button>
+
+                <button
+                    class="pattern-dot"
+                    data-number="5">
+                </button>
+
+                <button
+                    class="pattern-dot"
+                    data-number="6">
+                </button>
+
+
+                <button
+                    class="pattern-dot"
+                    data-number="7">
+                </button>
+
+                <button
+                    class="pattern-dot"
+                    data-number="8">
+                </button>
+
+                <button
+                    class="pattern-dot"
+                    data-number="9">
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="lock-hint">
+            Hint: Don't overthink it..just ask me
+        </div>
+
+
+        <div
+            class="lock-status"
+            id="lockStatus">
+
+            Draw the pattern
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================
+     MAIN WEBSITE
+====================================== -->
+
+<main id="website">
+
+
+<!-- ======================================
+     PAGE 1 — BIRTHDAY
+====================================== -->
+
+<section class="hero">
+
+    <div class="page hero-inner">
+
+        <div class="date">
+
+            <span class="tiny">
+                18/September
+            </span>
+
+            <div class="tiny-line"></div>
+
+            <span class="tiny"></span>
+
+        </div>
+
+
+        <div class="tiny">
+            A little something
+        </div>
+
+
+        <h1 class="hero-title">
+
+            For
+
+            <span>
+                YOU.
+            </span>
+
+        </h1>
+
+
+        <p class="hero-description">
+
+            I could've just sent you
+            a simple "Happy Birthday"
+
+            <br><br>
+
+            But apparently that wasn't
+            enough effort.
+
+            <br><br>
+
+            So... I made this instead.
+
+            <br><br>
+
+            <strong>
+                Happieeee Birthdayyyy Harishhhh!!!!
+            </strong>
+
+        </p>
+
+
+        <div class="scroll-note">
+
+            <span class="scroll-arrow">
+                ↓
+            </span>
+
+            Keep going.
+            There's a few things here.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================
+     PAGE 2 — THINGS ABOUT HIM
+====================================== -->
+
+<section class="section">
+
+    <div class="page center">
+
+        <div class="tiny">
+            a completely unbiased list
+        </div>
+
+
+        <h2 class="about-heading">
+            Things about you.
+        </h2>
+
+
+        <p class="about-description">
+
+            A few things I've noticed
+            about you along the way.
+
+            <br>
+
+            Don't let this compliment
+            your ego though.
+
+        </p>
+
+
+        <div class="traits">
+
+
+            <div class="trait">
+
+                <div class="trait-number">
+                    01
+                </div>
+
+                <h3>
+                    That smile.
+                </h3>
+
+                <p>
+
+                    Genuinely unfair.
+
+                    <br>
+
+                    You really didn't need
+                    to be given that much power.
+
+                </p>
+
+            </div>
+
+
+            <div class="trait">
+
+                <div class="trait-number">
+                    02
+                </div>
+
+                <h3>
+                    Your personality.
+                </h3>
+
+                <p>
+
+                    Somehow you're mix of brainrot reels,
+                    surprisingly good cooking and a
+                    personality I can't decide whether
+                    to appreciate or question..
+
+                    <br><br>
+
+                    Confusing, honestly.
+
+                </p>
+
+            </div>
+
+
+            <div class="trait">
+
+                <div class="trait-number">
+                    03
+                </div>
+
+                <h3>
+                    Just you.
+                </h3>
+
+                <p>
+
+                    Jokes aside,
+
+                    <br>
+
+                    I'm genuinely glad
+                    I got to know you.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================
+     PAGE 3 — BITMOJI
+====================================== -->
+
+<section class="bitmoji-section">
+
+    <div class="page center">
+
+        <div class="tiny">
+            Photographic evidence
+        </div>
+
+
+        <h2 class="bitmoji-heading">
+
+            Apparently...
+
+            <br>
+
+            <span>
+                So....This is us.
+            </span>
+
+        </h2>
+
+
+        <p class="bitmoji-description">
+
+            Funny how Snapchat is where we got to know each other.
+
+            <br><br>
+
+            This will have to count.
+
+            <br><br>
+
+            Consider this the official
+            photographic evidence.
+
+        </p>
+
+
+        <div class="bitmoji-frame">
+
+            <div class="scribble one">
+                literally us
+            </div>
+
+
+            <img
+                src="us.png"
+                alt="Enough evidence"
+            >
+
+
+            <div class="scribble two">
+                proof that we actually exist
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================
+     PAGE 4 — BIRTHDAY LETTER
+====================================== -->
+
+<section class="letter">
+
+    <div class="page">
+
+        <div class="letter-box">
+
+            <div class="tiny">
+                One proper Birthday wish
+            </div>
+
+
+            <h2>
+
+                Happy Birthday,
+
+                <br>
+
+                Harish!!!
+
+            </h2>
+
+
+            <p>
+                Okay, seriously for a minute.
+            </p>
+
+
+            <p>
+
+                I'm really glad we crossed paths.
+
+                <br><br>
+
+                Thank you for being the reason
+                I actually look forward to going
+                to college every day.
+
+            </p>
+
+
+            <p>
+
+                I’m really glad I got to know you.
+                You’ve become someone I genuinely
+                enjoy talking to.
+
+            </p>
+
+
+            <p>
+
+                I hope this year surprises you
+                in the best ways, takes you closer
+                to everything you want, and gives
+                you plenty of moments worth remembering.
+
+                <br><br>
+
+                Keep that charm, keep the good vibes,
+                and don't change too much,
+                keep being YOU.
+
+            </p>
+
+
+            <p>
+                I'll always be cheering for you.
+            </p>
+
+
+            <p class="hand">
+
+                Okay that's enough wholesomeness.
+
+                <br>
+
+                Don't let this get to your head.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================
+     PAGE 5 — OSU!
+====================================== -->
+
+<div class="game">
+
+    <div class="game-title">
+        One last thing...
+    </div>
+
+
+    <p
+        class="tiny"
+        style="margin-top:8px;"
+    >
+        Can you play osu! with me?
+    </p>
+
+
+    <!-- MIXED NUMBERS IN A STRAIGHT LINE -->
+
+    <div
+        class="oku-board"
+        id="okuBoard"
+    >
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(4)"
+        >
+            4
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(7)"
+        >
+            7
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(2)"
+        >
+            2
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(9)"
+        >
+            9
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(1)"
+        >
+            1
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(6)"
+        >
+            6
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(3)"
+        >
+            3
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(8)"
+        >
+            8
+        </button>
+
+        <button
+            class="oku-dot"
+            onclick="okuTap(5)"
+        >
+            5
+        </button>
+
+    </div>
+
+
+    <p
+        id="okuStatus"
+        class="tiny"
+        style="margin-top:18px;"
+    >
+        okay, let's see what you've got :)
+    </p>
+
+
+    <div
+        id="okuSecret"
+        class="oku-secret"
+    >
+
+        <div class="game-title">
+            okay fine...
+        </div>
+
+        <p>
+            You're kinda special to me.
+        </p>
+
+    </div>
+
+</div>
+
+
+</main>
+
+
+<footer>
+    made with questionable amounts of effort ♡
+</footer>
+
+
+<script>
+
+
+/* ======================================
+   FLOATING SYMBOLS
+====================================== */
+
+const floating =
+    document.getElementById("floating");
+
+const symbols = [
+    "♡",
+    "✦",
+    "·",
+    "✧",
+    "☁",
+    "⋆"
+];
+
+
+function createFloat(){
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "float-item";
+
+    item.innerText =
+        symbols[
+            Math.floor(
+                Math.random() *
+                symbols.length
+            )
+        ];
+
+    item.style.left =
+        Math.random() * 100 + "vw";
+
+    item.style.fontSize =
+        (12 + Math.random() * 15) + "px";
+
+    item.style.animationDuration =
+        (7 + Math.random() * 7) + "s";
+
+    floating.appendChild(item);
+
+    setTimeout(() => {
+        item.remove();
+    },15000);
+
+}
+
+setInterval(createFloat,1200);
+
+
+
+/* ======================================
+   PATTERN PASSWORD
+====================================== */
+
+const correctPattern = [
+    1,
+    2,
+    4,
+    5,
+    8,
+    9
+];
+
+
+const dots =
+    document.querySelectorAll(
+        ".pattern-dot"
+    );
+
+
+const patternArea =
+    document.getElementById(
+        "patternArea"
+    );
+
+
+const patternLines =
+    document.getElementById(
+        "patternLines"
+    );
+
+
+const lockStatus =
+    document.getElementById(
+        "lockStatus"
+    );
+
+
+let selectedPattern = [];
+
+let drawing = false;
+
+
+
+/* ======================================
+   GET DOT CENTER
+====================================== */
+
+function getDotCenter(dot){
+
+    const areaRect =
+        patternArea.getBoundingClientRect();
+
+    const rect =
+        dot.getBoundingClientRect();
+
+    return {
+
+        x:
+            rect.left +
+            rect.width / 2 -
+            areaRect.left,
+
+        y:
+            rect.top +
+            rect.height / 2 -
+            areaRect.top
+
+    };
+
+}
+
+
+
+/* ======================================
+   SELECT DOT
+====================================== */
+
+function selectDot(dot){
+
+    const number =
+        Number(dot.dataset.number);
+
+
+    if(
+        selectedPattern.includes(number)
+    ){
+        return;
+    }
+
+
+    selectedPattern.push(number);
+
+    dot.classList.add("active");
+
+
+    if(
+        selectedPattern.length > 1
+    ){
+
+        const previousNumber =
+            selectedPattern[
+                selectedPattern.length - 2
+            ];
+
+
+        const previous =
+            document.querySelector(
+                `.pattern-dot[data-number="${previousNumber}"]`
+            );
+
+
+        const start =
+            getDotCenter(previous);
+
+
+        const end =
+            getDotCenter(dot);
+
+
+        const line =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+            );
+
+
+        line.setAttribute(
+            "x1",
+            start.x
+        );
+
+
+        line.setAttribute(
+            "y1",
+            start.y
+        );
+
+
+        line.setAttribute(
+            "x2",
+            end.x
+        );
+
+
+        line.setAttribute(
+            "y2",
+            end.y
+        );
+
+
+        line.setAttribute(
+            "stroke",
+            "#aaa5cf"
+        );
+
+
+        line.setAttribute(
+            "stroke-width",
+            "4"
+        );
+
+
+        line.setAttribute(
+            "stroke-linecap",
+            "round"
+        );
+
+
+        line.setAttribute(
+            "opacity",
+            "0.9"
+        );
+
+
+        patternLines.appendChild(line);
+
+    }
+
+}
+
+
+
+/* ======================================
+   RESET PATTERN
+====================================== */
+
+function resetPattern(){
+
+    selectedPattern = [];
+
+
+    dots.forEach(dot => {
+
+        dot.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    patternLines.innerHTML = "";
+
+}
+
+
+
+/* ======================================
+   CHECK PATTERN
+====================================== */
+
+function checkPattern(){
+
+    const correct =
+        selectedPattern.length ===
+        correctPattern.length &&
+
+        selectedPattern.every(
+            (value,index) =>
+                value ===
+                correctPattern[index]
+        );
+
+
+    if(correct){
+
+        lockStatus.innerText =
+            "okayyy... you may enter ♡";
+
+
+        lockStatus.className =
+            "lock-status success";
+
+
+        setTimeout(() => {
+
+            document.getElementById(
+                "lockScreen"
+            ).style.display = "none";
+
+
+            document.getElementById(
+                "website"
+            ).classList.add("show");
+
+
+            window.scrollTo({
+                top:0,
+                behavior:"smooth"
+            });
+
+
+        },900);
+
+
+    }else{
+
+        lockStatus.innerText =
+            "nope 😭 try again.";
+
+
+        lockStatus.className =
+            "lock-status error";
+
+
+        setTimeout(() => {
+
+            resetPattern();
+
+
+            lockStatus.innerText =
+                "draw your pattern ♡";
+
+
+            lockStatus.className =
+                "lock-status";
+
+
+        },700);
+
+    }
+
+}
+
+
+
+/* ======================================
+   PATTERN MOUSE / TOUCH
+====================================== */
+
+dots.forEach(dot => {
+
+    dot.addEventListener(
+        "pointerdown",
+        event => {
+
+            event.preventDefault();
+
+            drawing = true;
+
+            resetPattern();
+
+            selectDot(dot);
+
+            patternArea.setPointerCapture(
+                event.pointerId
+            );
+
+        }
+    );
+
+
+});
+
+
+patternArea.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!drawing) return;
+
+
+        const element =
+            document.elementFromPoint(
+                event.clientX,
+                event.clientY
+            );
+
+
+        if(
+            element &&
+            element.classList.contains(
+                "pattern-dot"
+            )
+        ){
+
+            selectDot(element);
+
+        }
+
+    }
+);
+
+
+patternArea.addEventListener(
+    "pointerup",
+    event => {
+
+        if(!drawing) return;
+
+        drawing = false;
+
+
+        if(
+            patternArea.hasPointerCapture(
+                event.pointerId
+            )
+        ){
+
+            patternArea.releasePointerCapture(
+                event.pointerId
+            );
+
+        }
+
+
+        if(
+            selectedPattern.length > 0
+        ){
+
+            checkPattern();
+
+        }
+
+    }
+);
+
+
+patternArea.addEventListener(
+    "pointercancel",
+    () => {
+
+        drawing = false;
+
+    }
+);
+
+
+
+/* ======================================
+   OSU GAME
+====================================== */
+
+let okuNext = 1;
+
+
+function okuTap(number){
+
+    const button =
+        document.querySelector(
+            `.oku-dot[onclick="okuTap(${number})"]`
+        );
+
+
+    const status =
+        document.getElementById(
+            "okuStatus"
+        );
+
+
+    const secret =
+        document.getElementById(
+            "okuSecret"
+        );
+
+
+    if(
+        !button ||
+        !status ||
+        !secret
+    ){
+        return;
+    }
+
+
+    /* Correct number */
+
+    if(number === okuNext){
+
+        button.classList.add(
+            "clicked"
+        );
+
+
+        button.disabled = true;
+
+
+        okuNext++;
+
+
+        if(okuNext === 10){
+
+            status.innerText =
+                "okay... you actually did it :)";
+
+
+            secret.classList.add(
+                "show"
+            );
+
+
+        }else{
+
+            status.innerText =
+                `nice... ${10 - okuNext} more :)`;
+
+        }
+
+
+    }
+
+    /* Wrong number */
+
+    else{
+
+        button.classList.add(
+            "wrong"
+        );
+
+
+        status.innerText =
+            "nope 😭 start again.";
+
+
+        setTimeout(() => {
+
+            document
+                .querySelectorAll(
+                    ".oku-dot"
+                )
+                .forEach(dot => {
+
+                    dot.classList.remove(
+                        "clicked",
+                        "wrong"
+                    );
+
+                    dot.disabled = false;
+
+                });
+
+
+            okuNext = 1;
+
+
+            secret.classList.remove(
+                "show"
+            );
+
+
+            status.innerText =
+                "okay, let's see what you've got :)";
+
+
+        },500);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
